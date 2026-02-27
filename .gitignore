@@ -1,0 +1,17 @@
+build/
+.vs/
+*.exe
+*.lib
+*.pdb
+*.ilk
+Debug/
+Release/
+CMakeCache.txt
+CMakePresets.json
+CMakeUserPresets.json
+CMakeFiles/
+cmake_install.cmake
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
