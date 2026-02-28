@@ -8,6 +8,6 @@ const std::vector<Segment>& Tile::getSegments() const {
 	return segments;
 }
 
-//Tile Tile::rotate() const{
-//
-//}
+void Tile::rotate(){
+
+}

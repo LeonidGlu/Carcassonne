@@ -5,7 +5,7 @@
 struct Segment {
 	int id = -1;
 	TileType type;
-	std::vector<int> edges; //NESW
+	std::vector<int>  edges; //NESW
 	std::vector<int> connections;
 
 	bool hasMeeple = false;

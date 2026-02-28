@@ -9,7 +9,7 @@ public:
 	std::vector<Segment>& getSegments();
 	const std::vector<Segment>& getSegments() const;
 
-	//Tile rotate() const;
+	void rotate();
 private:
 	std::vector<Segment> segments;
 };
