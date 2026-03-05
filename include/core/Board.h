@@ -2,8 +2,8 @@
 #include <map>
 #include "Tile.h"
 #include "Position.h"
-#include "../graph/Graph.h"
-#include "../graph/UnionFind.h"
+#include "graph/Graph.h"
+#include "graph/UnionFind.h"
 
 class Board {
 public:

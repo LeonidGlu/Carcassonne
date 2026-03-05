@@ -1,7 +1,41 @@
 #include "core/Board.h"
 
 bool Board::canPlaceTile(const Tile& tile, Position pos) const {
-	return true;
+	if (tiles.empty()) {
+		return true;
+	}
+
+	if (tiles.count(pos)) {
+		return false;
+	}
+
+	bool hasNeighbors = false;
+
+	static const std::array<Position, 4> directions = { {
+		{0, 1}, {1, 0}, {0, -1}, {-1, 0}
+	} };
+
+	for (int d = 0; d < 4; ++d) {
+		Direction dir = static_cast<Direction>(d);
+		Position neighborPos{ pos.x + directions[d].x, pos.y + directions[d].y };
+
+		if (!tiles.count(neighborPos)) {
+			continue;
+		}
+
+		hasNeighbors = true;
+
+		const Tile& neighborTile = tiles.at(neighborPos);
+
+		int segIndex = tile.getSegmentIndex(dir);
+		int neighborIndex = neighborTile.getSegmentIndex(opposite(dir));
+
+		if (tile.getSegment(segIndex).type != neighborTile.getSegment(neighborIndex).type) {
+			return false;
+		}
+	}
+
+	return hasNeighbors;
 }
 
 
@@ -45,6 +79,7 @@ void Board::connectSegments(Tile& tile) {
 
 	for (size_t i = 0; i < seg.size(); ++i) {
 		for (int neirIndex : seg[i].connections) {
+
 			if (seg[i].type != seg[neirIndex].type) {
 				continue;
 			}
@@ -70,57 +105,37 @@ void Board::connectSegments(Tile& tile) {
 }
 
 void Board::connectWithNeighbors(Tile& tile, Position pos) {
-	static const std::vector<Position> directions = {
-		{0, 1},   
-		{1, 0},   
-		{0, -1},  
-		{-1, 0}   
-	};
+	static const std::array<Position, 4> directions = { {
+		{0, 1}, {1, 0}, {0, -1}, {-1, 0}
+	} };
 
-	for (int dir = 0; dir < 4; ++dir) {
-		Position neighborPos = { pos.x + directions[dir].x,
-								 pos.y + directions[dir].y };
+	for (int d = 0; d < 4; ++d) {
+		Direction dir = static_cast<Direction>(d);
+		Position neighborPos{ pos.x + directions[d].x, pos.y + directions[d].y };
 
-		if (!tiles.count(neighborPos))
+		if (!tiles.count(neighborPos)) {
 			continue;
+		}
 
 		Tile& neighborTile = tiles[neighborPos];
 
-		for (auto& seg : tile.getSegments()) {
-			for (int edge : seg.edges) {
-				if (edge != dir)
-					continue;
+		int segIndex = tile.getSegmentIndex(dir);
+		int neighborIndex = neighborTile.getSegmentIndex(opposite(dir));
 
-				for (auto& neighborSeg : neighborTile.getSegments()) {
-					for (int neighborEdge : neighborSeg.edges) {
-						if (neighborEdge != (dir + 2) % 4)
-							continue;
+		Segment& seg = tile.getSegment(segIndex);
+		Segment& neighborSeg = neighborTile.getSegment(neighborIndex);
 
-						if (seg.type != neighborSeg.type)
-							continue;
-
-						switch (seg.type) {
-						case TileType::City:
-							cityUF.unit(seg.id, neighborSeg.id);
-							cityGraph.addEdge(seg.id, neighborSeg.id);
-							break;
-
-						case TileType::Road:
-							roadUF.unit(seg.id, neighborSeg.id);
-							roadGraph.addEdge(seg.id, neighborSeg.id);
-							break;
-
-						case TileType::Field:
-							fielUF.unit(seg.id, neighborSeg.id);
-							fielGraph.addEdge(seg.id, neighborSeg.id);
-							break;
-
-						default:
-							break;
-						}
-					}
-				}
-			}
+		if (seg.type == TileType::City) {
+			cityUF.unit(seg.id, neighborSeg.id);
+			cityGraph.addEdge(seg.id, neighborSeg.id);
+		}
+		else if (seg.type == TileType::Road) {
+			roadUF.unit(seg.id, neighborSeg.id);
+			roadGraph.addEdge(seg.id, neighborSeg.id);
+		}
+		else if (seg.type == TileType::Field) {
+			fielUF.unit(seg.id, neighborSeg.id);
+			fielGraph.addEdge(seg.id, neighborSeg.id);
 		}
 	}
 }
