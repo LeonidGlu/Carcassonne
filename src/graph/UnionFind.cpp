@@ -14,6 +14,12 @@ int UnionFind::find(int x) {
 	return parent[x];
 }
 
+int UnionFind::find(int x) const {
+	if (parent[x] != x) {
+		parent[x] = find(parent[x]);
+	}
+}
+
 void UnionFind::unit(int a, int b) {
 	int rootA = find(a);
 	int rootB = find(b);

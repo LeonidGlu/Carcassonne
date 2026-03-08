@@ -1,5 +1,37 @@
 #include "core/Board.h"
 
+const std::map<Position, Tile>& Board::getTiles() const {
+	return tiles;
+}
+
+UnionFind& Board::getCityUF() {
+	return cityUF;
+}
+
+UnionFind& Board::getRoadUF() {
+	return roadUF;
+}
+
+bool Board::isCityClosed(int segmentID) const {
+	int root = cityUF.find(segmentID);
+
+	auto it = cityOpenEdges.find(root);
+	if (it == cityOpenEdges.end()) {
+		return false;
+	}
+	return it->second == 0;
+}
+
+bool Board::isRoadClosed(int segmentID) const {
+	int root = roadUF.find(segmentID);
+
+	auto it = roadOpenEdges.find(root);
+	if (it == roadOpenEdges.end()) {
+		return false;
+	}
+	return it->second == 0;
+}
+
 bool Board::canPlaceTile(const Tile& tile, Position pos) const {
 	if (tiles.empty()) {
 		return true;
@@ -38,7 +70,6 @@ bool Board::canPlaceTile(const Tile& tile, Position pos) const {
 	return hasNeighbors;
 }
 
-
 bool Board::placeTile(Tile tile, Position pos) {
 	if (!canPlaceTile(tile, pos)) {
 		return false;
@@ -49,6 +80,8 @@ bool Board::placeTile(Tile tile, Position pos) {
 	connectWithNeighbors(tile, pos);
 
 	tiles[pos] = tile;
+
+	updateOpenEdges(pos);
 
 	return true;
 }
@@ -136,6 +169,46 @@ void Board::connectWithNeighbors(Tile& tile, Position pos) {
 		else if (seg.type == TileType::Field) {
 			fielUF.unit(seg.id, neighborSeg.id);
 			fielGraph.addEdge(seg.id, neighborSeg.id);
+		}
+	}
+}
+
+void Board::updateOpenEdges(Position pos) {
+	const Tile& tile = tiles.at(pos);
+
+	static const std::array<Position, 4> directions = { {
+		{0, 1}, {1, 0}, {0, -1}, {-1, 0}
+	} };
+
+	for (int d = 0; d < 4; ++d) {
+		Direction dir = static_cast<Direction>(d);
+		Position neighborPos{ pos.x + directions[d].x, pos.y + directions[d].y };
+
+		int segIndex = tile.getSegmentIndex(dir);
+		const Segment& seg = tile.getSegment(segIndex);
+
+		if (seg.type != TileType::City && seg.type != TileType::Road) {
+			continue;
+		}
+
+		UnionFind& uf = (seg.type == TileType::City) ? cityUF : roadUF;
+		auto& openEdges = (seg.type == TileType::City) ? cityOpenEdges : roadOpenEdges;
+
+		int segRoot = uf.find(seg.id);
+
+		if (!tiles.count(neighborPos)) {
+			openEdges[segRoot]++;
+		}
+		else {
+			const Tile& neighborTile = tiles.at(neighborPos);
+			int neighborSegIndex = neighborTile.getSegmentIndex(opposite(dir));
+			const Segment& neighborSeg = neighborTile.getSegment(neighborSegIndex);
+
+			int neighborSegRoot = uf.find(neighborSeg.id);
+
+			if (openEdges.count(neighborSegRoot) && openEdges[neighborSegRoot] > 0) {
+				openEdges[neighborSegRoot]--;
+			}
 		}
 	}
 }
