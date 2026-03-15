@@ -11,7 +11,7 @@ add_subdirectory(src/graph)
 
 add_executable(Carcassonne
 	src/main.cpp
-)
+ "include/core/RegionManager.h" "include/core/PlacementValidator.h" "include/core/MoveGenerator.h" "include/core/ScoreCalculator.h" "include/core/TypedRegion.h")
 
 target_link_libraries(Carcassonne
 	PRIVATE
