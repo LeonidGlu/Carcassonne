@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
-#include "Tile.h"
-#include "Position.h"
+#include "tiles/Tile.h"
+#include "common/Position.h"
 
 class Board {
 public:

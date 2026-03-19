@@ -4,17 +4,18 @@ TypedRegion& RegionManager::getRegion(TileType type) {
 	if (type == TileType::City) return cityRegion;
 	else if (type == TileType::Road) return roadRegion;
 	else if (type == TileType::Field) return fieldRegion;
+	else throw std::invalid_argument("Unknown TileType");
 }
 
 const TypedRegion& RegionManager::getRegion(TileType type) const {
 	if (type == TileType::City) return cityRegion;
 	else if (type == TileType::Road) return roadRegion;
 	else if (type == TileType::Field) return fieldRegion;
+	else throw std::invalid_argument("Unknown TileType");
 }
 
 void RegionManager::onTilePlaced(Tile& tile, Position pos, const Board& board) {
 	initializeSegments(tile);
-	connectSegments(tile);
 	connectWithNeighbors(tile, pos, board);
 	updateRegionInfo(tile, pos, board);
 }
@@ -26,23 +27,6 @@ void RegionManager::initializeSegments(Tile& tile) {
 		}
 		i.id = getRegion(i.type).addElement();
 	}
-}
-
-void RegionManager::connectSegments(Tile& tile) {
-	auto& seg = tile.getSegments();
-
-	for (size_t i = 0; i < seg.size(); ++i) {
-		if (seg[i].type == TileType::Monastery) {
-			continue;
-		}
-		for (int connectionsIndex : seg[i].connections) {
-			if (seg[i].type != seg[connectionsIndex].type) {
-				continue;
-			}
-			getRegion(seg[i].type).unite(seg[i].id, seg[connectionsIndex].id);
-		}
-	}
-
 }
 
 void RegionManager::connectWithNeighbors(Tile& tile, Position pos, const Board& board) {
@@ -114,5 +98,15 @@ void RegionManager::updateRegionInfo(Tile& tile, Position pos, const Board& boar
 }
 
 bool RegionManager::isMonasteryClosed(Position pos, const Board& board) const {
+	for (int x = -1; x < 1; x++) {
+		for (int y = -1; y < 1; y++) {
+			if (x == 0 && y == 0) {
+				continue;
+			}
+			if (!board.hasTile({ pos.x + x, pos.y + y })) {
+				return false;
+			}
+		}
+	}
 	return true;
 }

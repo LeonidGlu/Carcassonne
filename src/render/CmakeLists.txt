@@ -1,0 +1,13 @@
+add_library(render
+	Render.cpp
+)
+
+target_include_directories(render
+	PUBLIC
+		${PROJECT_SOURCE_DIR}/include
+)
+
+target_link_libraries(render
+	PUBLIC
+		core
+)

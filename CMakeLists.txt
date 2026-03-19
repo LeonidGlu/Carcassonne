@@ -8,13 +8,21 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(src/core)
 add_subdirectory(src/graph)
-
+add_subdirectory(src/game)
+add_subdirectory(src/render)
+add_subdirectory(src/tiles)
 add_executable(Carcassonne
 	src/main.cpp
- "include/core/RegionManager.h" "include/core/PlacementValidator.h" "include/core/MoveGenerator.h" "include/core/ScoreCalculator.h" "include/core/TypedRegion.h")
+ "include/game/Game.h" "include/game/Deck.h" "include/game/Player.h" "include/render/Render.h")
+
+target_link_directories(Carcassonne
+	PRIVATE
+		${PROJECT_SOURCE_DIR}/include
+)
 
 target_link_libraries(Carcassonne
 	PRIVATE
 		core
-		graph
+		game
+		render
 )

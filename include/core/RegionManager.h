@@ -1,6 +1,6 @@
 #pragma once
-#include "core/Board.h"
-#include "core/Tile.h"
+#include "Board.h"
+#include "tiles/Tile.h"
 #include "TypedRegion.h"
 #include <set>
 #include <array>
@@ -25,7 +25,6 @@ private:
 	TypedRegion fieldRegion;
 
 	void initializeSegments(Tile& tile);
-	void connectSegments(Tile& tile);
 	void connectWithNeighbors(Tile& tile, Position pos, const Board& board);
 	void updateRegionInfo(Tile& tile, Position pos, const Board& board);
 };
