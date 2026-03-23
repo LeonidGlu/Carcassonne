@@ -5,11 +5,6 @@
 #include <set>
 #include <array>
 
-struct RegionInfo {
-	int openEdges = 0;
-	int tileCount = 0;
-};
-
 class RegionManager {
 public:
 	void onTilePlaced(Tile& tile, Position pos, const Board& board);

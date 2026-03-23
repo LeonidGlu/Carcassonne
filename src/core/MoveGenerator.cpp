@@ -19,6 +19,19 @@ std::vector<Move> MoveGenerator::generateMoves(const Tile& tile, const Board& bo
 	return moves;
 }
 
+std::vector<Move> MoveGenerator::generatePosition(const Tile& tile, const Board& board) const {
+	std::vector<Move> moves;
+	auto candidates = getEmptyNeighbors(board);
+
+	for (Position pos : candidates) {
+		if (validator.canPlace(tile, pos, board)) {
+			moves.push_back({ pos, 0 });
+		}
+	}
+
+	return moves;
+}
+
 std::vector<Position> MoveGenerator::getEmptyNeighbors(const Board& board) const {
 	const std::array<Position, 4> deltas = { {{0, 1}, {1, 0}, {0, -1}, {-1, 0}} };
 	std::set<Position> candidates;

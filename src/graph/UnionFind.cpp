@@ -18,6 +18,7 @@ int UnionFind::find(int x) const {
 	if (parent[x] != x) {
 		parent[x] = find(parent[x]);
 	}
+	return parent[x];
 }
 
 void UnionFind::unit(int a, int b) {

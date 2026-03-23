@@ -7,6 +7,8 @@
 
 class Tile {
 public:
+	Tile() = default;
+
 	Tile(const std::vector<Segment>& seg, const std::array<int, 9>& pos);
 
 	std::vector<Segment>& getSegments();
