@@ -1,4 +1,5 @@
 #include "core/RegionManager.h"
+#include <iostream>
 
 TypedRegion& RegionManager::getRegion(TileType type) {
 	if (type == TileType::City) return cityRegion;
@@ -42,10 +43,10 @@ void RegionManager::connectWithNeighbors(Tile& tile, Position pos, const Board& 
 
 		const Tile& neighbor = board.getTile(neighborPos);
 		int segIndex = tile.getSegmentIndex(dir);
-		int neighborSegIndex = tile.getSegmentIndex(opposite(dir));
+		int neighborSegIndex = neighbor.getSegmentIndex(opposite(dir));
 
 		Segment& segment = tile.getSegment(segIndex);
-		const Segment neighborSegment = tile.getSegment(neighborSegIndex);
+		const Segment neighborSegment = neighbor.getSegment(neighborSegIndex);
 
 		if (segment.type != neighborSegment.type) {
 			continue;
@@ -98,8 +99,8 @@ void RegionManager::updateRegionInfo(Tile& tile, Position pos, const Board& boar
 }
 
 bool RegionManager::isMonasteryClosed(Position pos, const Board& board) const {
-	for (int x = -1; x < 1; x++) {
-		for (int y = -1; y < 1; y++) {
+	for (int x = -1; x <= 1; x++) {
+		for (int y = -1; y <= 1; y++) {
 			if (x == 0 && y == 0) {
 				continue;
 			}
@@ -109,4 +110,12 @@ bool RegionManager::isMonasteryClosed(Position pos, const Board& board) const {
 		}
 	}
 	return true;
+}
+
+void RegionManager::debug() const {
+	std::cout << "\n========== RegionManager ==========\n";
+	cityRegion.debug("City");
+	roadRegion.debug("Road");
+	fieldRegion.debug("Field");
+	std::cout << "====================================\n";
 }

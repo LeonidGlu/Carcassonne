@@ -14,6 +14,8 @@ public:
 	TypedRegion& getRegion(TileType type);
 	const TypedRegion& getRegion(TileType type) const;
 
+	void debug() const;
+
 private:
 	TypedRegion cityRegion;
 	TypedRegion roadRegion;

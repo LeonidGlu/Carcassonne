@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 
 class Graph {
 public:
@@ -10,6 +11,8 @@ public:
 	const std::vector<int>& getNeighbors(int node) const;
 
 	bool hasNode(int id) const;
+
+	void debug() const;
 
 private:
 	std::unordered_map<int, std::vector<int>> adjacencyGraph;

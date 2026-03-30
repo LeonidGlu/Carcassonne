@@ -41,3 +41,48 @@ void UnionFind::unit(int a, int b) {
 bool UnionFind::connected(int a, int b) {
 	return find(a) == find(b);
 }
+
+void UnionFind::debug(const std::string& name) const {
+    std::cout << "  UnionFind";
+    if (!name.empty()) std::cout << " [" << name << "]";
+    std::cout << "\n";
+
+    if (parent.empty()) {
+        std::cout << "  (empty)\n";
+        return;
+    }
+
+    std::cout << "  id:     ";
+    for (size_t i = 0; i < parent.size(); ++i) {
+        std::cout << std::setw(3) << i;
+    }
+    std::cout << "\n";
+
+    std::cout << "  parent: ";
+    for (size_t i = 0; i < parent.size(); ++i) {
+        std::cout << std::setw(3) << parent[i];
+    }
+    std::cout << "\n";
+
+    std::cout << "  rank:   ";
+    for (size_t i = 0; i < rank.size(); ++i) {
+        std::cout << std::setw(3) << rank[i];
+    }
+    std::cout << "\n";
+
+    std::unordered_map<int, std::vector<int>> components;
+    for (size_t i = 0; i < parent.size(); ++i) {
+        int root = find(static_cast<int>(i));
+        components[root].push_back(static_cast<int>(i));
+    }
+
+    std::cout << "  Components:\n";
+    for (auto& i : components) {
+        std::cout << "    root=" << i.first << ": [";
+        for (size_t j = 0; j < i.second.size(); ++j) {
+            if (j > 0) std::cout << ", ";
+            std::cout << i.second[j];
+        }
+        std::cout << "]\n";
+    }
+}

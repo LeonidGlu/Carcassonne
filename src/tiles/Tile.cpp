@@ -49,3 +49,41 @@ void Tile::rotate(){
 
 	posToSegment = rotated;
 }
+
+void Tile::debug() const {
+    static const std::array<std::string, 9> posNames = { {
+        "NW", "N ", "NE",
+        "W ", "C ", "E ",
+        "SW", "S ", "SE"
+    } };
+
+    static const std::array<std::string, 4> typeNames = { {
+        "Road", "City", "Mnst", "Fild"
+    } };
+
+    std::cout << "  Tile:\n";
+    std::cout << "  ---------------------------\n";
+
+    for (int row = 0; row < 3; ++row) {
+        std::cout << "  | ";
+        for (int col = 0; col < 3; ++col) {
+            int idx = row * 3 + col;
+            int segIdx = posToSegment[idx];
+            TileType type = segments[segIdx].type;
+            int id = segments[segIdx].id;
+
+            std::cout << posNames[idx] << "="
+                << typeNames[static_cast<int>(type)]
+                << "(id=" << std::setw(2) << id << ") ";
+        }
+        std::cout << "|\n";
+    }
+    std::cout << "  ----------------------------\n";
+
+    std::cout << "  Segments:\n";
+    for (size_t i = 0; i < segments.size(); ++i) {
+        std::cout << "    [" << i << "] "
+            << typeNames[static_cast<int>(segments[i].type)]
+            << " id=" << segments[i].id << "\n";
+    }
+}

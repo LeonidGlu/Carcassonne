@@ -93,3 +93,28 @@ void TypedRegion::incrementTileCount(int segmentID) {
 	}
 	it->second.tileCount++;
 }
+
+void TypedRegion::debug(const std::string& name) const {
+	if (!name.empty()) {
+		std::cout << "  --- " << name << " ---\n";
+	}
+
+	if (regions.empty()) {
+		std::cout << "  (no regions)\n";
+		return;
+	}
+
+	std::cout << "  Regions:\n";
+	for (auto& i : regions) {
+		std::cout << "    root=" << std::setw(3) << i.first
+			<< " | openEdges=" << std::setw(2) << i.second.openEdges
+			<< " | tileCount=" << std::setw(2) << i.second.tileCount
+			<< (i.second.openEdges == 0 ? " [CLOSED]" : " [OPEN]")
+			<< "\n";
+	}
+
+	uf.debug();
+
+	std::cout << "  Graph:\n";
+	graph.debug();
+}

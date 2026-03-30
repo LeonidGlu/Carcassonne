@@ -1,9 +1,11 @@
-#include "Board.h"
+#pragma once
+#include "core/Board.h"
 #include "core/RegionManager.h"
 #include "core/PlacementValidator.h"
 #include "core/MoveGenerator.h"
 #include "core/ScoreCalculator.h"
 #include "common/Position.h"
+#include "common/Debug.h"
 #include "tiles/Tile.h"
 #include <vector>
 

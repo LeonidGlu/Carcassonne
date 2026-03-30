@@ -26,3 +26,19 @@ const std::vector<int>& Graph::getNeighbors(int node) const {
 bool Graph::hasNode(int id) const {
 	return adjacencyGraph.find(id) != adjacencyGraph.end();
 }
+
+void Graph::debug() const {
+	if (adjacencyGraph.empty()) {
+		std::cout << "  (empty)\n";
+		return;
+	}
+
+	for (auto& i : adjacencyGraph) {
+		std::cout << "  " << i.first << " -> [";
+		for (size_t j = 0; j < i.second.size(); ++j) {
+			if (j > 0) std::cout << ", ";
+			std::cout << i.second[j];
+		}
+		std::cout << "]\n";
+	}
+}

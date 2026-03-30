@@ -7,7 +7,7 @@ int ScoreCalculator::calcScore(Position pos) const {
 	const Tile& tile = board.getTile(pos);
 	int totalScore = 0;
 
-	std::set<int> scoredRoots;
+	std::set<std::pair<TileType, int>> scoredRoots;
 
 	for (const Segment& seg : tile.getSegments()) {
 		if (seg.type == TileType::Field) {
@@ -22,11 +22,13 @@ int ScoreCalculator::calcScore(Position pos) const {
 		}
 
 		int root = regionManager.getRegion(seg.type).getRoot(seg.id);
+		auto key = std::make_pair(seg.type, root);
 
-		if (scoredRoots.count(root)) {
+
+		if (scoredRoots.count(key)) {
 			continue;
 		}
-		scoredRoots.insert(root);
+		scoredRoots.insert(key);
 		ScoreResult result;
 
 		if (seg.type == TileType::City) {

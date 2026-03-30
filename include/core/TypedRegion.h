@@ -22,6 +22,8 @@ public:
 	void removeOpenEdges(int segmentID);
 	void incrementTileCount(int segmentID);
 
+	void debug(const std::string& name = "") const;
+
 private:
 	UnionFind uf;
 	Graph graph;
