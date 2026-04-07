@@ -26,6 +26,9 @@ void RegionManager::initializeSegments(Tile& tile) {
 		if (i.type == TileType::Monastery) {
 			continue;
 		}
+		if (i.type == TileType::Crossroad) {
+			continue;
+		}
 		i.id = getRegion(i.type).addElement();
 	}
 }
@@ -54,6 +57,13 @@ void RegionManager::connectWithNeighbors(Tile& tile, Position pos, const Board& 
 		if (segment.type == TileType::Monastery) {
 			continue;
 		}
+		if (segment.type == TileType::Crossroad) {
+			continue;
+		}
+		if (neighborSegment.type == TileType::Crossroad) {
+			continue;
+		}
+		 
 		getRegion(segment.type).unite(segment.id, neighborSegment.id);
 	}
 }
@@ -76,6 +86,18 @@ void RegionManager::updateRegionInfo(Tile& tile, Position pos, const Board& boar
 		if (seg.type == TileType::Monastery) {
 			continue;
 		}
+		if (seg.type == TileType::Crossroad) {
+			if (board.hasTile(neighborPos)) {
+				const Tile& neighbor = board.getTile(neighborPos);
+				int neighborSegIndex = neighbor.getSegmentIndex(opposite(dir));
+				const Segment& neighborSeg = neighbor.getSegment(neighborSegIndex);
+
+				if (neighborSeg.type == TileType::Road) {
+					roadRegion.removeOpenEdges(neighborSeg.id);
+				}
+			}
+			continue;
+		}
 
 		TypedRegion& region = getRegion(seg.type);
 		if (!board.hasTile(neighborPos)) {
@@ -85,7 +107,10 @@ void RegionManager::updateRegionInfo(Tile& tile, Position pos, const Board& boar
 			const Tile& neighbor = board.getTile(neighborPos);
 			int neighborSegIndex = neighbor.getSegmentIndex(opposite(dir));
 			const Segment& neighborSeg = neighbor.getSegment(neighborSegIndex);
-			region.removeOpenEdges(neighborSeg.id);
+
+			if (!(neighborSeg.type == TileType::Crossroad)) {
+				region.removeOpenEdges(neighborSeg.id);
+			}
 		}
 
 		int root = region.getRoot(seg.id);

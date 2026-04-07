@@ -6,6 +6,7 @@ char Render::getSymbol(TileType type) const {
 		case TileType::Field: return 'F';
 		case TileType::Monastery: return 'M';
 		case TileType::Road: return 'R';
+		case TileType::Crossroad: return 'X';
 		default: return '?';
 	}
 }

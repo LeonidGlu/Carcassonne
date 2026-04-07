@@ -13,6 +13,9 @@ int ScoreCalculator::calcScore(Position pos) const {
 		if (seg.type == TileType::Field) {
 			continue;
 		}
+		if (seg.type == TileType::Crossroad) {
+			continue;
+		}
 		if (seg.type == TileType::Monastery) {
 			ScoreResult result = calcMonasteryScore(pos);
 			if (result.isClosed) {

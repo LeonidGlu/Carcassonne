@@ -6,6 +6,7 @@ enum class TileType {
 	City,
 	Monastery,
 	Field,
+    Crossroad
 };
 
 inline std::ostream& operator<<(std::ostream& os, const TileType& type) {
@@ -14,6 +15,7 @@ inline std::ostream& operator<<(std::ostream& os, const TileType& type) {
     case TileType::City:      os << "City"; break;
     case TileType::Monastery: os << "Monastery"; break;
     case TileType::Field:     os << "Field"; break;
+    case TileType::Crossroad: os << "Crossroad"; break;
     default:                  os << "Unknown";
     }
     return os;

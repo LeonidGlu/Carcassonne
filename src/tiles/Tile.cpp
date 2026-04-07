@@ -57,8 +57,8 @@ void Tile::debug() const {
         "SW", "S ", "SE"
     } };
 
-    static const std::array<std::string, 4> typeNames = { {
-        "Road", "City", "Mnst", "Fild"
+    static const std::array<std::string, 5> typeNames = { {
+        "Road", "City", "Mnst", "Fild", "Crss"
     } };
 
     std::cout << "  Tile:\n";

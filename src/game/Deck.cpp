@@ -9,6 +9,9 @@ static const std::vector<std::pair<std::string, int>> DECK = {
     { "CityTwo",      3 },
     { "CityCorner",   3 },
     { "FullCity",     1 },
+    { "Crossroad4",   1 },
+    { "Crossroad3",   4 },
+    { "Crossroad2",   3 },
 };
 
 Deck::Deck() {
