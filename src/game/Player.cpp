@@ -13,3 +13,21 @@ const std::string& Player::getName() const {
 const int Player::getScore() const {
 	return score;
 }
+
+bool Player::hasMeeple() const {
+	return meeples > 0;
+}
+
+int Player::getMeepleCount() const {
+	return meeples;
+}
+
+void Player::placeMeeple() {
+	if (meeples > 0) {
+		meeples--;
+	}
+}
+
+void Player::returnMeeple() {
+	meeples++;
+}

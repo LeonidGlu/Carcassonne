@@ -10,7 +10,13 @@ public:
 	const std::string& getName() const;
 	const int getScore() const;
 
+	bool hasMeeple() const;
+	int getMeepleCount() const;
+	void placeMeeple();
+	void returnMeeple();
+
 private:
 	std::string name;
 	int score = 0;
+	int meeples = 7;
 };

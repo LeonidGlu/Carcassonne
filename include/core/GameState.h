@@ -9,12 +9,20 @@
 #include "tiles/Tile.h"
 #include <vector>
 
+struct ClosedRegion {
+	int score = 0;
+	std::vector<Meeple> meeples;
+};
+
 class GameState {
 public:
 	GameState();
 
-	bool placeTile(Tile tile, Position pos, int& score);
-	
+	bool placeTile(Tile tile, Position pos);
+	void placeMeeple(const Segment& seg, Position pos, int playerIndex);
+	std::vector<ClosedRegion> checkAndCloseRegions(Position pos);
+
+	std::vector<Segment> getAvailableRegions(const Tile& tile) const;
 	std::vector<Move> getValidMoves(const Tile& tile) const;
 	std::vector<Move> getValidPositions(const Tile& tile) const;
 

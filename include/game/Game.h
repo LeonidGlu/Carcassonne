@@ -34,6 +34,10 @@ private:
 	int askRotation() const;
 	Move askPosition(const std::vector<Move>& moves) const;
 
+	void processClosedRegions(const std::vector<ClosedRegion>& closedRegions);
+	void handleMeeple(const Tile& tile, Position pos);
+	int askMeeple(const std::vector<Segment>& regions) const;
+
 	Player& currentPlayerRef();
 
 };

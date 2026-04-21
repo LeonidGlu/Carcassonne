@@ -27,15 +27,15 @@ void Game::run() {
 void Game::placeStartTile() {
 	Tile startTile = TileFactory::create("StartTile");
 
-	int score = 0;
-	gameState.placeTile(startTile, { 0, 0 }, score);
+	std::vector<ClosedRegion> closedRegion;
+	gameState.placeTile(startTile, { 0, 0 });
 	render.renderBoard(gameState.getBoard());
 }
 
 void Game::playTurn() {
 	Player& player = currentPlayerRef();
 
-	render.clearScreen();
+	//render.clearScreen();
 	render.renderBoard(gameState.getBoard());
 	render.renderScores(players);
 
@@ -54,16 +54,18 @@ void Game::playTurn() {
 		tile.rotate();
 	}
 
-	int score = 0;
-	if (!gameState.placeTile(tile, move.pos, score)) {
+	if (!gameState.placeTile(tile, move.pos)) {
 		std::cout << "Errror! Can't place tile!\n";
+		return;
 	}
 
-	if (score > 0) {
-		player.addScore(score);
-	}
+	handleMeeple(gameState.getBoard().getTile(move.pos), move.pos);
 
-	render.clearScreen();
+	std::vector<ClosedRegion> closed = gameState.checkAndCloseRegions(move.pos);
+
+	processClosedRegions(closed);
+
+	//render.clearScreen();
 	render.renderBoard(gameState.getBoard());
 	render.renderScores(players);
 
@@ -122,7 +124,7 @@ Move Game::getPlayerMove(const Tile& tile) {
 			continue;
 		}
 
-		render.clearScreen();
+		//render.clearScreen();
 		render.renderBoardWithMoves(gameState.getBoard(), moves);
 		render.renderTile(rotatedTile);
 
@@ -168,6 +170,86 @@ Move Game::askPosition(const std::vector<Move>& moves) const {
 	}
 
 	return moves[choose];
+}
+
+void Game::processClosedRegions(const std::vector<ClosedRegion>& closedRegions) {
+	for (const ClosedRegion& region : closedRegions) {
+		if (region.meeples.empty()) {
+			continue;
+		}
+		std::unordered_map<int, int> meepleCount;
+		for (const Meeple& meeple : region.meeples) {
+			meepleCount[meeple.getPlayer()]++;
+		}
+
+		int maxCount = 0;
+		for (auto& i : meepleCount) {
+			maxCount = std::max(maxCount, i.second);
+		}
+
+		for (auto& i : meepleCount) {
+			if (i.second == maxCount) {
+				players[i.first].addScore(region.score);
+				std::cout << players[i.first].getName() << " scored " << region.score << " points!\n";
+			}
+		}
+
+		for (const Meeple& meeple : region.meeples) {
+			players[meeple.getPlayer()].returnMeeple();
+		}
+	}
+}
+
+void Game::handleMeeple(const Tile& tile, Position pos) {
+	Player& player = currentPlayerRef();
+
+	if (!player.hasMeeple()) {
+		std::cout << "You have no meeples left!\n";
+		return;
+	}
+
+	std::vector<Segment> regions = gameState.getAvailableRegions(tile);
+
+	if (regions.empty()) {
+		std::cout << "No available regions for meeple!\n";
+		return;
+	}
+
+	std::cout << "\n----- PLACE MEEPLE -----\n";
+	std::cout << "Availabble regions:\n";
+	for (size_t i = 0; i < regions.size(); ++i) {
+		std::cout << "[" << i << "] - " << regions[i].type << "\n";
+	}
+
+	std::cout << "[" << regions.size() << "] - Skip\n";
+
+	int choise = askMeeple(regions);
+
+	if (choise == static_cast<int>(regions.size())) {
+		std::cout << "Skipped meeple placement!\n";
+		return;
+	}
+
+	player.placeMeeple();
+	gameState.placeMeeple(regions[choise], pos, currentPlayer);
+	std::cout << "Meeple placed!\n";
+}
+
+int Game::askMeeple(const std::vector<Segment>& regions) const {
+	int choose;
+
+	std::cout << "Yout choise (0 - " << regions.size() << "): ";
+
+	while (true) {
+		if (std::cin >> choose && choose >= 0 && choose <= static_cast<int>(regions.size())) {
+			break;
+		}
+		std::cout << "Incorrect input\nEnter a number from 0 to " << regions.size() << ": ";
+		std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	}
+
+	return choose;
 }
 
 Player& Game::currentPlayerRef() {

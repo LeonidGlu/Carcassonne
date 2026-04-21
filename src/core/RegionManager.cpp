@@ -137,10 +137,50 @@ bool RegionManager::isMonasteryClosed(Position pos, const Board& board) const {
 	return true;
 }
 
+void RegionManager::onMeeplePlaced(int segmentID, TileType type, Meeple meeple) {
+	getRegion(type).addMeeple(segmentID, meeple);
+}
+
+void RegionManager::onMonasteryMeeplePlaced(Position pos, Meeple meeple) {
+	monasteryMeeples[pos].push_back(meeple);
+}
+
+std::vector<Meeple> RegionManager::getMeeples(int segmentID, TileType type) const {
+	return getRegion(type).getMeeples(segmentID);
+}
+
+std::vector<Meeple> RegionManager::getMonasteryMeeples(Position pos) const {
+	auto it = monasteryMeeples.find(pos);
+	if (it == monasteryMeeples.end()) {
+		return {};
+	}
+	return it->second;
+}
+
+void RegionManager::clearMeeples(int segmentID, TileType type) {
+	getRegion(type).clearMeeples(segmentID);
+}
+
+void RegionManager::clearMonasteryMeeples(Position pos) {
+	monasteryMeeples.erase(pos);
+}
+
 void RegionManager::debug() const {
 	std::cout << "\n========== RegionManager ==========\n";
 	cityRegion.debug("City");
 	roadRegion.debug("Road");
 	fieldRegion.debug("Field");
+
+	if (!monasteryMeeples.empty()) {
+		std::cout << "  --- Monastery meeples ---\n";
+		for (auto& i : monasteryMeeples) {
+			std::cout << "    pos=(" << i.first.x << "," << i.first.y << ") | meeples: [";
+			for (size_t j = 0; j < i.second.size(); ++j) {
+				if (j > 0) std::cout << ", ";
+				std::cout << "p" << i.second[j].getPlayer();
+			}
+			std::cout << "]\n";
+		}
+	}
 	std::cout << "====================================\n";
 }

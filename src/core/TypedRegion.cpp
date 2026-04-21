@@ -26,12 +26,16 @@ void TypedRegion::unite(int idA, int idB) {
 	int newRoot = uf.find(idA);
 
 	regions[newRoot] = merged;
+
 	if (newRoot != rootA) {
 		regions.erase(rootA);
 	}
 	if (newRoot != rootB) {
 		regions.erase(rootB);
 	}
+
+	transferMeeples(rootA, newRoot);
+	transferMeeples(rootB, newRoot);
 }
 
 bool TypedRegion::isClosed(int segmentID) const {
@@ -94,6 +98,39 @@ void TypedRegion::incrementTileCount(int segmentID) {
 	it->second.tileCount++;
 }
 
+void TypedRegion::addMeeple(int segmentID, Meeple meeple) {
+	int root = uf.find(segmentID);
+	meeples[root].push_back(meeple);
+}
+
+std::vector<Meeple> TypedRegion::getMeeples(int segmentID) const {
+	int root = uf.find(segmentID);
+	auto it = meeples.find(root);
+	if (it == meeples.end()) {
+		return {};
+	}
+	return it->second;
+}
+
+void TypedRegion::clearMeeples(int segmentID) {
+	int root = uf.find(segmentID);
+	meeples.erase(root);
+}
+
+void TypedRegion::transferMeeples(int from, int to) {
+	if (from == to) {
+		return;
+	}
+	auto it = meeples.find(from);
+	if (it == meeples.end()) {
+		return;
+	}
+
+	auto& target = meeples[to];
+	target.insert(target.end(), it->second.begin(), it->second.end());
+	meeples.erase(it);
+}
+
 void TypedRegion::debug(const std::string& name) const {
 	if (!name.empty()) {
 		std::cout << "  --- " << name << " ---\n";
@@ -109,8 +146,22 @@ void TypedRegion::debug(const std::string& name) const {
 		std::cout << "    root=" << std::setw(3) << i.first
 			<< " | openEdges=" << std::setw(2) << i.second.openEdges
 			<< " | tileCount=" << std::setw(2) << i.second.tileCount
-			<< (i.second.openEdges == 0 ? " [CLOSED]" : " [OPEN]")
-			<< "\n";
+			<< (i.second.openEdges == 0 ? " [CLOSED]" : " [OPEN]");
+
+		auto it = meeples.find(i.first);
+		if (it != meeples.end() && !it->second.empty()) {
+			std::cout << " | meeples: [";
+			for (size_t j = 0; j < it->second.size(); ++j) {
+				if (j > 0) std::cout << ", ";
+				std::cout << "player" << it->second[j].getPlayer();
+			}
+			std::cout << "]";
+		}
+		else {
+			std::cout << " | meeples: []";
+		}
+
+		std::cout << "\n";
 	}
 
 	uf.debug();

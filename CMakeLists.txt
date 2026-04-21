@@ -20,9 +20,10 @@ add_subdirectory(src/graph)
 add_subdirectory(src/game)
 add_subdirectory(src/render)
 add_subdirectory(src/tiles)
+add_subdirectory(src/meeple)
 add_executable(Carcassonne
 	src/main.cpp
- )
+)
 
 target_link_directories(Carcassonne
 	PRIVATE
@@ -34,4 +35,5 @@ target_link_libraries(Carcassonne
 		core
 		game
 		render
+		meeple
 )

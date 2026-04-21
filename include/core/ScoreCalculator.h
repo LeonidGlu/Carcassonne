@@ -12,8 +12,6 @@ class ScoreCalculator {
 public:
     ScoreCalculator(const RegionManager& regionManager, const Board& board);
 
-    int calcScore(Position pos) const;
-
     ScoreResult calcMonasteryScore(Position pos) const;
     ScoreResult calcCityScore(int segmentID) const;
     ScoreResult calcRoadScore(int segmentID) const;

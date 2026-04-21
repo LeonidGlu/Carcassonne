@@ -3,52 +3,6 @@
 ScoreCalculator::ScoreCalculator(const RegionManager& regionManager, const Board& board) 
 	: regionManager(regionManager), board(board) {}
 
-int ScoreCalculator::calcScore(Position pos) const {
-	const Tile& tile = board.getTile(pos);
-	int totalScore = 0;
-
-	std::set<std::pair<TileType, int>> scoredRoots;
-
-	for (const Segment& seg : tile.getSegments()) {
-		if (seg.type == TileType::Field) {
-			continue;
-		}
-		if (seg.type == TileType::Crossroad) {
-			continue;
-		}
-		if (seg.type == TileType::Monastery) {
-			ScoreResult result = calcMonasteryScore(pos);
-			if (result.isClosed) {
-				totalScore += result.score;
-			}
-			continue;
-		}
-
-		int root = regionManager.getRegion(seg.type).getRoot(seg.id);
-		auto key = std::make_pair(seg.type, root);
-
-
-		if (scoredRoots.count(key)) {
-			continue;
-		}
-		scoredRoots.insert(key);
-		ScoreResult result;
-
-		if (seg.type == TileType::City) {
-			result = calcCityScore(seg.id);
-		}
-		else if (seg.type == TileType::Road) {
-			result = calcRoadScore(seg.id);
-		}
-
-		if (result.isClosed) {
-			totalScore += result.score;
-		}
-	}
-
-	return totalScore;
-}
-
 ScoreResult ScoreCalculator::calcCityScore(int segmentID) const {
 	const TypedRegion& region = regionManager.getRegion(TileType::City);
 
