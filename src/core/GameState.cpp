@@ -100,9 +100,38 @@ std::vector<ClosedRegion> GameState::checkAndCloseRegions(Position pos) {
 		}
 	}
 
+	checkNeighborsMonasteries(pos, closed);
+
 	DEBUG_LOG("Score after placed: " << closed.size());
 
 	return closed;
+}
+
+void GameState::checkNeighborsMonasteries(Position pos, std::vector<ClosedRegion>& closed) {
+	const std::array<Position, 8> neighbors = { {
+		{pos.x - 1, pos.y - 1}, {pos.x, pos.y - 1}, {pos.x + 1, pos.y - 1},
+		{pos.x - 1, pos.y}, {pos.x + 1, pos.y},
+		{pos.x - 1, pos.y + 1}, {pos.x, pos.y + 1}, {pos.x + 1, pos.y + 1}
+		} };
+
+	for (const Position& neighborPos : neighbors) {
+		if (!board.hasTile(neighborPos)) {
+			continue;
+		}
+
+		const Tile& neighborTile = board.getTile(neighborPos);
+		for (const Segment& seg : neighborTile.getSegments()) {
+			if (seg.type != TileType::Monastery) {
+				continue;
+			}
+
+			ScoreResult result = scoreCalc.calcMonasteryScore(neighborPos);
+			if (result.isClosed) {
+				closed.push_back({ result.score, regionManager.getMonasteryMeeples(neighborPos) });
+				regionManager.clearMonasteryMeeples(neighborPos);
+			}
+		}
+	}
 }
 
 std::vector<Move> GameState::getValidMoves(const Tile& tile) const {

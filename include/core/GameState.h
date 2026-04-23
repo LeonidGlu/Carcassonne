@@ -37,4 +37,6 @@ private:
 	MoveGenerator moveGenerator;
 	ScoreCalculator scoreCalc;
 
+	void checkNeighborsMonasteries(Position pos, std::vector<ClosedRegion>& closed);
+
 };
