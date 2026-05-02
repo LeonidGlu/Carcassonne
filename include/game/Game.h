@@ -37,6 +37,9 @@ private:
 	void processClosedRegions(const std::vector<ClosedRegion>& closedRegions);
 	void handleMeeple(const Tile& tile, Position pos);
 	int askMeeple(const std::vector<Segment>& regions) const;
+	void renderMeepleInfo() const;
+
+	void renderCurrentBoard(const std::vector<Player>& players) const;
 
 	Player& currentPlayerRef();
 

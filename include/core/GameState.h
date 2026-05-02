@@ -1,4 +1,5 @@
 #pragma once
+#include "meeple/Meeple.h"
 #include "core/Board.h"
 #include "core/RegionManager.h"
 #include "core/PlacementValidator.h"

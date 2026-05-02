@@ -31,7 +31,7 @@ void Render::getBoardBorder(const Board& board, int& minX, int& minY, int& maxX,
 	}
 }
 
-void Render::printCellLine(const Tile& tile, int line) const {
+void Render::printCellLine(const Tile& tile, int line)  const {
 	static const std::array<std::array<TilePosition, 3>, 3> pos = { {
 		{{ TilePosition::NW, TilePosition::N,  TilePosition::NE }},
 		{{ TilePosition::W,  TilePosition::C,  TilePosition::E  }},
@@ -41,7 +41,8 @@ void Render::printCellLine(const Tile& tile, int line) const {
 	std::cout << "[";
 	for (int i = 0; i < 3; ++i) {
 		int segIndex = tile.getSegmentIndex(pos[line][i]);
-		std::cout << getSymbol(tile.getSegment(segIndex).type);
+		const Segment& seg = tile.getSegment(segIndex);
+		std::cout << TerminalColor::getSegmentColor(seg) << getSymbol(seg.type) << TerminalColor::RESET;
 	}
 	std::cout << "]";
 }
@@ -189,4 +190,32 @@ void Render::renderValidMoves(const std::vector<Move>& moves) const {
 			<< std::setw(2) << moves[i].pos.x << ", "
 			<< std::setw(2) << moves[i].pos.y << ")\n";
 	}
+}
+
+void Render::renderMeepleInfo(TileType type, Position pos, const std::vector<Meeple>& meeples, const std::vector<Player>& players) const {
+	std::unordered_map<int, int> count;
+	for (const Meeple& meeple : meeples) {
+		count[meeple.getPlayer()]++;
+	}
+
+	std::cout << type << " (" << pos.x << ", " << pos.y << "): ";
+	
+	if (count.size() == 1) {
+		auto& meepleCnt = *count.begin();
+		std::cout << players[meepleCnt.first].getName();
+		if (meepleCnt.second > 1) std::cout << "(" << meepleCnt.second << ")";
+	}
+	else {
+		std::cout << "[CONTESTED] ";
+		bool first = true;
+		for (auto& meepleCnt : count) {
+			if (!first) {
+				std::cout << " vs ";
+			}
+			std::cout << players[meepleCnt.first].getName() << "(" << meepleCnt.second << ")";
+			first = false;
+		}
+	}
+
+	std::cout << "\n";
 }

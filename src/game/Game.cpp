@@ -35,9 +35,7 @@ void Game::placeStartTile() {
 void Game::playTurn() {
 	Player& player = currentPlayerRef();
 
-	//render.clearScreen();
-	render.renderBoard(gameState.getBoard());
-	render.renderScores(players);
+	renderCurrentBoard(players);
 
 	std::cout << "--------------------------\n";
 	std::cout << player.getName() << "'s turn\n";
@@ -65,10 +63,7 @@ void Game::playTurn() {
 
 	processClosedRegions(closed);
 
-	//render.clearScreen();
-	render.renderBoard(gameState.getBoard());
-	render.renderScores(players);
-
+	renderCurrentBoard(players);
 }
 
 void Game::nextPlayer() {
@@ -80,8 +75,7 @@ void Game::endGame() {
 	std::cout << "GAME OVER\n";
 	std::cout << "--------------------------\n";
 
-	render.renderBoard(gameState.getBoard());
-	render.renderScores(players);
+	renderCurrentBoard(players);
 
 	int maxScore = -1;
 	std::vector<std::string> winners;
@@ -250,6 +244,47 @@ int Game::askMeeple(const std::vector<Segment>& regions) const {
 	}
 
 	return choose;
+}
+
+void Game::renderMeepleInfo() const {
+	const Board& board = gameState.getBoard();
+	const RegionManager& rm = gameState.getRegionManager();
+
+	std::cout << "\n----- MEEPLES -----\n";
+	std::set<std::pair<TileType, int>> visited;
+
+	for (const auto& tile : board.getAllTiles()) {
+		for (const Segment& seg : tile.second.getSegments()) {
+			if (seg.id < 0) {
+				continue;
+			}
+			if (seg.type == TileType::Crossroad) {
+				continue;
+			}
+
+			int root = rm.getRegion(seg.type).getRoot(seg.id);
+			auto key = std::make_pair(seg.type, root);
+			if (visited.count(key)) {
+				continue;
+			}
+
+			visited.insert(key);
+
+			auto meeples = rm.getMeeples(seg.id, seg.type);
+			if (meeples.empty()) {
+				continue;
+			}
+			
+			render.renderMeepleInfo(seg.type, tile.first, meeples, players);
+		}
+	}
+}
+
+void Game::renderCurrentBoard(const std::vector<Player>& players) const {
+	render.clearScreen();
+	render.renderBoard(gameState.getBoard());
+	renderMeepleInfo();
+	render.renderScores(players);
 }
 
 Player& Game::currentPlayerRef() {
