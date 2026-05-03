@@ -24,6 +24,7 @@ public:
 	const TypedRegion& getRegion(TileType type) const;
 
 	void debug() const;
+	void debugFieldRegions(const Board& board);
 
 private:
 	TypedRegion cityRegion;
@@ -34,5 +35,6 @@ private:
 
 	void initializeSegments(Tile& tile);
 	void connectWithNeighbors(Tile& tile, Position pos, const Board& board);
+	void connectFieldCorners(Tile& tile, Position pos, const Board& board);
 	void updateRegionInfo(Tile& tile, Position pos, const Board& board);
 };

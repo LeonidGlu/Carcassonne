@@ -18,6 +18,7 @@ const TypedRegion& RegionManager::getRegion(TileType type) const {
 void RegionManager::onTilePlaced(Tile& tile, Position pos, const Board& board) {
 	initializeSegments(tile);
 	connectWithNeighbors(tile, pos, board);
+	connectFieldCorners(tile, pos, board);
 	updateRegionInfo(tile, pos, board);
 }
 
@@ -51,7 +52,7 @@ void RegionManager::connectWithNeighbors(Tile& tile, Position pos, const Board& 
 		Segment& segment = tile.getSegment(segIndex);
 		const Segment neighborSegment = neighbor.getSegment(neighborSegIndex);
 
-		if (segment.type != neighborSegment.type) {
+		if (segment.type == TileType::Field) {
 			continue;
 		}
 		if (segment.type == TileType::Monastery) {
@@ -61,6 +62,9 @@ void RegionManager::connectWithNeighbors(Tile& tile, Position pos, const Board& 
 			continue;
 		}
 		if (neighborSegment.type == TileType::Crossroad) {
+			continue;
+		}
+		if (segment.type != neighborSegment.type) {
 			continue;
 		}
 		 
@@ -119,6 +123,38 @@ void RegionManager::updateRegionInfo(Tile& tile, Position pos, const Board& boar
 		if (!visitedComponents.count(key)) {
 			region.incrementTileCount(seg.id);
 			visitedComponents.insert(key);
+		}
+	}
+}
+
+void RegionManager::connectFieldCorners(Tile& tile, Position pos, const Board& board) {
+	const std::array<Position, 4> deltas = { {{0, 1}, {1, 0}, {0, -1}, {-1, 0}} };
+
+	const std::array<std::array<std::pair<TilePosition, TilePosition>, 2>, 4> corners = { {
+		{{{TilePosition::NW, TilePosition::SW}, {TilePosition::NE, TilePosition::SE}}},
+		{{{TilePosition::NE, TilePosition::NW}, {TilePosition::SE, TilePosition::SW}}},
+		{{{TilePosition::SW, TilePosition::NW}, {TilePosition::SE, TilePosition::NE}}},
+		{{{TilePosition::NW, TilePosition::NE}, {TilePosition::SW, TilePosition::SE}}}
+	} };
+
+	for (int d = 0; d < 4; ++d) {
+		Position neighborPos{ pos.x + deltas[d].x, pos.y + deltas[d].y };
+
+		if (!board.hasTile(neighborPos)) {
+			continue;
+		}
+
+		const Tile& neighbor = board.getTile(neighborPos);
+		for (auto& corner : corners[d]) {
+			int segIndex = tile.getSegmentIndex(corner.first);
+			int neighborSegIndex = neighbor.getSegmentIndex(corner.second);
+
+			const Segment& seg = tile.getSegment(segIndex);
+			const Segment& neighborSeg = neighbor.getSegment(neighborSegIndex);
+
+			if (seg.type == TileType::Field && neighborSeg.type == TileType::Field) {
+				fieldRegion.unite(seg.id, neighborSeg.id);
+			}
 		}
 	}
 }
@@ -183,4 +219,31 @@ void RegionManager::debug() const {
 		}
 	}
 	std::cout << "====================================\n";
+}
+
+void RegionManager::debugFieldRegions(const Board& board) {
+	std::cout << "\n========== FIELD REGIONS PER TILE ==========\n";
+	
+	for (const auto& tile : board.getAllTiles()) {
+		std::cout << "Tile (" << tile.first.x << ", " << tile.first.y << "):\n";
+
+		std::set<int> visitedSegments;
+
+		for (const Segment& seg : tile.second.getSegments()) {
+			if (seg.type != TileType::Field) {
+				continue;
+			}
+			if (seg.id < 0) {
+				continue;
+			}
+			if (visitedSegments.count(seg.id)) {
+				continue;
+			}
+
+			visitedSegments.insert(seg.id);
+			int root = fieldRegion.getRoot(seg.id);
+			std::cout << " segmentID= " << seg.id << " ---> root= " << root << "\n";
+		}
+
+	}
 }

@@ -10,8 +10,15 @@ void Graph::addEdge(int a, int b) {
 	addNode(a);
 	addNode(b);
 
-	adjacencyGraph[a].push_back(b);
-	adjacencyGraph[b].push_back(a);
+	auto& neighborsA = adjacencyGraph[a];
+	if (std::find(neighborsA.begin(), neighborsA.end(), b) == neighborsA.end()) {
+		neighborsA.push_back(b);
+	}
+
+	auto& neighborsB = adjacencyGraph[b];
+	if (std::find(neighborsB.begin(), neighborsB.end(), a) == neighborsB.end()) {
+		neighborsB.push_back(a);
+	}
 }
 
 const std::vector<int>& Graph::getNeighbors(int node) const {

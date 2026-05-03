@@ -16,6 +16,7 @@ bool GameState::placeTile(Tile tile, Position pos) {
 
 	DEBUG_LOG("After placed:");
 	DEBUG_CALL(regionManager.debug());
+	DEBUG_CALL(regionManager.debugFieldRegions(board));
 
 	return true;
 }
