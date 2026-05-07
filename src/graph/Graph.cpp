@@ -21,6 +21,22 @@ void Graph::addEdge(int a, int b) {
 	}
 }
 
+void Graph::removeNode(int id) {
+	if (!hasNode(id)) {
+		return;
+	}
+
+	for (int neighbor : adjacencyGraph[id]) {
+		auto& neighbors = adjacencyGraph[neighbor];
+		neighbors.erase(std::remove(neighbors.begin(), neighbors.end(), id), neighbors.end());
+	}
+	adjacencyGraph.erase(id);
+}
+
+void Graph::clear() {
+	adjacencyGraph.clear();
+}
+
 const std::vector<int>& Graph::getNeighbors(int node) const {
 	static const std::vector<int> empty;
 	auto it = adjacencyGraph.find(node);
@@ -28,6 +44,14 @@ const std::vector<int>& Graph::getNeighbors(int node) const {
 		return empty;
 	}
 	return it->second;
+}
+
+const std::unordered_map<int, std::vector<int>> Graph::getAdjacencyGraph() const {
+	return adjacencyGraph;
+}
+
+bool Graph::isEmpty() const {
+	return adjacencyGraph.empty();
 }
 
 bool Graph::hasNode(int id) const {

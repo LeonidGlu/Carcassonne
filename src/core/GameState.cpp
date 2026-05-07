@@ -34,7 +34,7 @@ void GameState::placeMeeple(const Segment& seg, Position pos, int playerIndex) {
 
 std::vector<Segment> GameState::getAvailableRegions(const Tile& tile) const {
 	std::vector<Segment> result;
-	std::set<int> visitedRoots;
+	std::set<std::pair<TileType, int>> visitedRoots;
 
 	for (const Segment& seg : tile.getSegments()) {
 		if (seg.type == TileType::Crossroad) {
@@ -48,8 +48,9 @@ std::vector<Segment> GameState::getAvailableRegions(const Tile& tile) const {
 		}
 
 		int root = regionManager.getRegion(seg.type).getRoot(seg.id);
-		if (!visitedRoots.count(root)) {
-			visitedRoots.insert(root);
+		auto key = std::make_pair(seg.type, root);
+		if (!visitedRoots.count(key)) {
+			visitedRoots.insert(key);
 			result.push_back(seg);
 		}
 		

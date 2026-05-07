@@ -39,3 +39,27 @@ ScoreResult ScoreCalculator::calcMonasteryScore(Position pos) const {
 	}
 	return ScoreResult{ score, closed };
 }
+
+int ScoreCalculator::calcFieldScore(int segmentID) const {
+	const TypedRegion& fieldRegion = regionManager.getRegion(TileType::Field);
+	const TypedRegion& cityRegion = regionManager.getRegion(TileType::City);
+	const Graph& regionGraph = regionManager.getRegionGraph();
+	int fieldRoot = fieldRegion.getRoot(segmentID);
+	int encodedField = regionManager.encodedRegion(TileType::Field, fieldRoot);
+
+	std::set<int> scoredCityRoots;
+
+	for (int neighbor : regionGraph.getNeighbors(encodedField)) {
+		auto a = regionManager.decodedRegion(neighbor);
+
+		if (a.first != TileType::City) {
+			continue;
+		}
+		if (!cityRegion.isClosed(a.second)) {
+			continue;
+		}
+		scoredCityRoots.insert(a.second);
+	}
+
+	return static_cast<int>(scoredCityRoots.size()) * 3;
+}

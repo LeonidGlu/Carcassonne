@@ -15,6 +15,7 @@ public:
     ScoreResult calcMonasteryScore(Position pos) const;
     ScoreResult calcCityScore(int segmentID) const;
     ScoreResult calcRoadScore(int segmentID) const;
+    int calcFieldScore(int segmentID) const;
 
 private:
     const RegionManager& regionManager;

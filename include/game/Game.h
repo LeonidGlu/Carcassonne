@@ -30,6 +30,8 @@ private:
 	void nextPlayer();
 	void endGame();
 
+	void calcFinalScores();
+
 	Move getPlayerMove(const Tile& tile);
 	int askRotation() const;
 	Move askPosition(const std::vector<Move>& moves) const;

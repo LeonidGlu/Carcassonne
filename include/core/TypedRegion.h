@@ -9,16 +9,24 @@ struct RegionInfo {
 	int tileCount = 0;
 };
 
+struct UniteResult {
+	int oldRootA;
+	int oldRootB;
+	int newRoot;
+	bool merged;
+};
+
 class TypedRegion {
 public:
 	int addElement();
-	void unite(int idA, int idB);
+	UniteResult unite(int idA, int idB);
 
 	bool isClosed(int segmentID) const;
 
 	int getTileCount(int segmentID) const;
 	int getOpenEdges(int segmentID) const;
 	int getRoot(int segmentID) const;
+	const Graph& getGraph() const;
 
 	void addOpenEdges(int segmentID);
 	void removeOpenEdges(int segmentID);

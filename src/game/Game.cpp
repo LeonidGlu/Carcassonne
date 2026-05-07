@@ -71,6 +71,8 @@ void Game::nextPlayer() {
 }
 
 void Game::endGame() {
+	calcFinalScores();
+
 	std::cout << "--------------------------\n";
 	std::cout << "GAME OVER\n";
 	std::cout << "--------------------------\n";
@@ -100,6 +102,68 @@ void Game::endGame() {
 		}
 		std::cout << "with " << maxScore << " points\n";
 	}
+}
+
+void Game::calcFinalScores() {
+	std::cout << "\n---- FINAL SCORES ----\n";
+	
+	const RegionManager& rm = gameState.getRegionManager();
+	const Board& board = gameState.getBoard();
+
+	std::vector<ClosedRegion> finalRegions;
+	std::set<std::pair<TileType, int>> processedRoots;
+
+	for (const auto& tiles : board.getAllTiles()) {
+		for (const Segment& seg : tiles.second.getSegments()) {
+			if (seg.id < 0) {
+				continue;
+			}
+			if (seg.type == TileType::Crossroad) {
+				continue;
+			}
+
+			if (seg.type == TileType::Monastery) {
+				std::vector<Meeple> meeples = rm.getMonasteryMeeples(tiles.first);
+				
+				if (meeples.empty()) {
+					continue;
+				}
+
+				ScoreResult result = gameState.getScoreCalc().calcMonasteryScore(tiles.first);
+				finalRegions.push_back({ result.score, meeples });
+				continue;
+			}
+
+			int root = rm.getRegion(seg.type).getRoot(seg.id);
+			auto key = std::make_pair(seg.type, root);
+			if (processedRoots.count(key)) {
+				continue;
+			}
+			processedRoots.insert(key);
+
+			std::vector<Meeple> meeples = rm.getMeeples(seg.id, seg.type);
+			if (meeples.empty()) {
+				continue;
+			}
+
+			int score = 0;
+			if (seg.type == TileType::City) {
+				score = gameState.getScoreCalc().calcCityScore(seg.id).score;
+			}
+			else if (seg.type == TileType::Road) {
+				score = gameState.getScoreCalc().calcRoadScore(seg.id).score;
+			}
+			else if (seg.type == TileType::Field) {
+				score = gameState.getScoreCalc().calcFieldScore(seg.id);
+			}
+
+			if (score == 0) {
+				continue;
+			}
+			finalRegions.push_back({ score, meeples });
+		}
+	}
+	processClosedRegions(finalRegions);
 }
 
 Move Game::getPlayerMove(const Tile& tile) {
@@ -281,7 +345,7 @@ void Game::renderMeepleInfo() const {
 }
 
 void Game::renderCurrentBoard(const std::vector<Player>& players) const {
-	render.clearScreen();
+	//render.clearScreen();
 	render.renderBoard(gameState.getBoard());
 	renderMeepleInfo();
 	render.renderScores(players);

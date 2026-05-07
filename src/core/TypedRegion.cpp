@@ -7,13 +7,13 @@ int TypedRegion::addElement() {
 	return id;
 }
 
-void TypedRegion::unite(int idA, int idB) {
+UniteResult TypedRegion::unite(int idA, int idB) {
 	int rootA = uf.find(idA);
 	int rootB = uf.find(idB);
 
 	if (rootA == rootB) {
 		graph.addEdge(idA, idB);
-		return;
+		return { rootA, rootB, rootA, false };
 	}
 
 	RegionInfo merged;
@@ -36,6 +36,8 @@ void TypedRegion::unite(int idA, int idB) {
 
 	transferMeeples(rootA, newRoot);
 	transferMeeples(rootB, newRoot);
+
+	return { rootA, rootB, newRoot, true };
 }
 
 bool TypedRegion::isClosed(int segmentID) const {
@@ -67,6 +69,10 @@ int TypedRegion::getOpenEdges(int segmentID) const {
 
 int TypedRegion::getRoot(int segmentID) const {
 	return uf.find(segmentID);
+}
+
+const Graph& TypedRegion::getGraph() const {
+	return graph;
 }
 
 void TypedRegion::addOpenEdges(int segmentID) {

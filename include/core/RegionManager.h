@@ -14,6 +14,7 @@ public:
 
 	std::vector<Meeple> getMeeples(int segmentID, TileType type) const;
 	std::vector<Meeple> getMonasteryMeeples(Position pos) const;
+	const Graph& getRegionGraph() const;
 
 	void clearMeeples(int segmentID, TileType type);
 	void clearMonasteryMeeples(Position pos);
@@ -23,16 +24,24 @@ public:
 	TypedRegion& getRegion(TileType type);
 	const TypedRegion& getRegion(TileType type) const;
 
+	static int encodedRegion(TileType type, int root);
+	static std::pair<TileType, int> decodedRegion(int encoded);
+
 	void debug() const;
 	void debugFieldRegions(const Board& board);
+	void debugRegionGraph() const;
 
 private:
 	TypedRegion cityRegion;
 	TypedRegion roadRegion;
 	TypedRegion fieldRegion;
 
+	Graph regionGraph;
+
 	std::map<Position, std::vector<Meeple>> monasteryMeeples;
 
+	void updateRegionGraph(Tile& tile);
+	void mergeRegionGraphNodes(TileType type, int oldRootA, int oldRootB, int newRoot);
 	void initializeSegments(Tile& tile);
 	void connectWithNeighbors(Tile& tile, Position pos, const Board& board);
 	void connectFieldCorners(Tile& tile, Position pos, const Board& board);
