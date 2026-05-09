@@ -27,7 +27,7 @@ Tile Deck::draw() {
     if (isEmpty()) {
         throw std::runtime_error("Deck is empty!");
     }
-    return tiles[currentIndex++];
+    return std::move(tiles[currentIndex++]);
 }
 
 bool Deck::isEmpty() const {

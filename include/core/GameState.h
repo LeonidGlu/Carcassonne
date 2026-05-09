@@ -19,7 +19,7 @@ class GameState {
 public:
 	GameState();
 
-	bool placeTile(Tile tile, Position pos);
+	bool placeTile(const Tile& tile, Position pos);
 	void placeMeeple(const Segment& seg, Position pos, int playerIndex);
 	std::vector<ClosedRegion> checkAndCloseRegions(Position pos);
 
