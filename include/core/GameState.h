@@ -29,6 +29,7 @@ public:
 
 	const Board& getBoard() const;
 	const RegionManager& getRegionManager() const;
+	const PlacementValidator& getValidator() const;
 	const ScoreCalculator& getScoreCalc() const;
 
 private:

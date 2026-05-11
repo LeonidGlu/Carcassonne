@@ -154,6 +154,10 @@ const RegionManager& GameState::getRegionManager() const {
 	return regionManager;
 }
 
+const PlacementValidator& GameState::getValidator() const {
+	return validator;
+}
+
 const ScoreCalculator& GameState::getScoreCalc() const {
 	return scoreCalc;
 }
